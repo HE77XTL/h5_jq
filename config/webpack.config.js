@@ -1,34 +1,59 @@
 const path = require('path');
+const glob = require('glob');
+
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+/** 从 page.config.js 中扫描获取入口以及对应的模板*/
+function scanEntry() {
+    const srcDir = path.join(__dirname, '../src/views');
+    return glob.sync(srcDir + '/**/page.config.js').map(name => {
+        const dirPattern = /(?<=\/views\/).*(?=\/)/;
+        const dirName = name.match(dirPattern);
+        const pageConfig = require(name)
+        return {
+            name: dirName[0],
+            pages: pageConfig.pages
+        }
+    });
 
+}
+
+function getEntryAndTemplate(modelData) {
+    let entry = {};
+    let htmlTemplate = [];
+
+    modelData.forEach(item => {
+        item.pages.forEach(pagesItem => {
+            const entryKey = item.name + '_' + pagesItem.entry.replace('.js', '');
+            entry[entryKey] = path.resolve(__dirname, `../src/views/${item.name}/${pagesItem.entry}`);
+            htmlTemplate.push(new HtmlWebpackPlugin({
+                template: path.resolve(__dirname, `../src/views/${item.name}/${pagesItem.template}`),
+                filename: `html/${item.name}/${pagesItem.template}`,
+                chunks: [entryKey],
+            }))
+        })
+    });
+    return {
+        entry,
+        htmlTemplate
+    }
+}
+
+const {entry, htmlTemplate} = getEntryAndTemplate(scanEntry());
 const webpackConfig = {
     mode: 'production',
-    entry: {
-        home: path.resolve(__dirname, '../src/views/home/index.js'),
-        about: path.resolve(__dirname, '../src/views/about/index.js'),
-    },
+    entry,
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: '[name]/index_v[hash].js',
+        filename: 'js/[name]_v[hash].js',
         clean: true,
     },
-    plugins: [
-        new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, '../src/views/home/index.html'),
-            filename: 'home/index.html',
-            chunks: ['home'],
-        }),
-        new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, '../src/views/about/index.html'),
-            filename: 'about/index.html',
-            chunks: ['about'],
-        }),
+    plugins: htmlTemplate.concat([
         new MiniCssExtractPlugin({
-            filename: `[name]/[name]_v[hash].css`
+            filename: `css/[name]_v[hash].css`
         })
-    ],
+    ]),
     module: {
         rules: [
             {

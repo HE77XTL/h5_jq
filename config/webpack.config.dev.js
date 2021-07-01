@@ -9,6 +9,6 @@ module.exports = Object.assign({}, base, {
         port: 9001,
         hot: true,
         open: true,
-        openPage: 'home',
+        openPage: 'html/home',
     },
 })
