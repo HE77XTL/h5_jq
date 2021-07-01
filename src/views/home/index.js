@@ -1,0 +1,10 @@
+import './index.less'
+
+function component() {
+    const element = document.createElement('div');
+    element.innerText = 'hello webpack';
+    element.classList.add('hello');
+    return element;
+}
+
+document.body.appendChild(component());
