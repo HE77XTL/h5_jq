@@ -1,6 +1,5 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
@@ -13,9 +12,9 @@ const webpackConfig = {
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: '[name]/index_v[hash].js',
+        clean: true,
     },
     plugins: [
-        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/views/home/index.html'),
             filename: 'home/index.html',
