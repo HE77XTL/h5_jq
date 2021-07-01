@@ -1,4 +1,5 @@
 import './index.less'
+import './home.less'
 
 function component() {
     const element = document.createElement('div');

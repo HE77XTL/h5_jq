@@ -5,20 +5,29 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 
 const webpackConfig = {
+    mode: 'production',
     entry: {
-        home: path.resolve(__dirname, '../src/views/home/index.js')
+        home: path.resolve(__dirname, '../src/views/home/index.js'),
+        about: path.resolve(__dirname, '../src/views/about/index.js'),
     },
     output: {
-        path: path.resolve(__dirname, '../dist')
+        path: path.resolve(__dirname, '../dist'),
+        filename: '[name]/index_v[hash].js',
     },
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, '../src/views/home/index.html'),
-            filename: 'index.html'
+            filename: 'home/index.html',
+            chunks: ['home'],
+        }),
+        new HtmlWebpackPlugin({
+            template: path.resolve(__dirname, '../src/views/about/index.html'),
+            filename: 'about/index.html',
+            chunks: ['about'],
         }),
         new MiniCssExtractPlugin({
-            filename: `css/[name]_v[hash:4].css`
+            filename: `[name]/[name]_v[hash].css`
         })
     ],
     module: {
